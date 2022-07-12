@@ -20,7 +20,7 @@ exports[`Testing snapshot for actions-heap destination: trackEvent action - all 
 Object {
   "app_id": "kFJwrNh$DP38FB",
   "event": "kFJwrNh$DP38FB",
-  "idempotency_key": "1",
+  "idempotency_key": "kFJwrNh$DP38FB",
   "identity": "kFJwrNh$DP38FB",
   "properties": Object {
     "segment_library": "kFJwrNh$DP38FB",
@@ -34,7 +34,7 @@ exports[`Testing snapshot for actions-heap destination: trackEvent action - requ
 Object {
   "app_id": "kFJwrNh$DP38FB",
   "event": "kFJwrNh$DP38FB",
-  "idempotency_key": "1",
+  "idempotency_key": "kFJwrNh$DP38FB",
   "identity": "kFJwrNh$DP38FB",
   "properties": Object {
     "segment_library": "destinations-actions",

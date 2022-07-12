@@ -8,7 +8,12 @@ const HEAP_TEST_APP_ID = '11'
 describe('Heap.trackEvent', () => {
   it('should validate action fields for identified users', async () => {
     const testTimestampValue = '2021-08-17T15:21:15.449Z'
-    const event = createTestEvent({ timestamp: testTimestampValue, event: 'Test Event', userId: 'foo@example.org' })
+    const event = createTestEvent({
+      timestamp: testTimestampValue,
+      event: 'Test Event',
+      userId: 'foo@example.org',
+      messageId: '123'
+    })
 
     nock('https://heapanalytics.com').post('/api/track').reply(200, {})
 
@@ -30,7 +35,7 @@ describe('Heap.trackEvent', () => {
         segment_library: 'analytics.js'
       }),
       timestamp: testTimestampValue,
-      idempotency_key: '1'
+      idempotency_key: '123'
     })
   })
 
@@ -40,9 +45,9 @@ describe('Heap.trackEvent', () => {
       timestamp: testTimestampValue,
       event: 'Test Event',
       anonymousId: '5a41f0df-b69a-4a99-b656-79506a86c3f8',
-      userId: null
+      userId: null,
+      messageId: '123'
     })
-    console.log(event)
 
     nock('https://heapanalytics.com').post('/api/track').reply(200, {})
 
@@ -65,7 +70,7 @@ describe('Heap.trackEvent', () => {
         segment_library: 'analytics.js'
       }),
       timestamp: testTimestampValue,
-      idempotency_key: '1'
+      idempotency_key: '123'
     })
   })
 })

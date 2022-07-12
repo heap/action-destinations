@@ -5,7 +5,6 @@ import { defaultValues } from '@segment/actions-core'
 import identifyUser from './identifyUser'
 
 // Used in the quick setup.
-// :TODO: Create presets for all supported actions.
 const presets: DestinationDefinition['presets'] = [
   {
     name: 'Track Calls',
