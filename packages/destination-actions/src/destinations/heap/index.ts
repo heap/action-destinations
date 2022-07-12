@@ -2,6 +2,7 @@ import type { DestinationDefinition } from '@segment/actions-core'
 import type { Settings } from './generated-types'
 import trackEvent from './trackEvent'
 import { defaultValues } from '@segment/actions-core'
+import identifyUser from './identifyUser'
 
 // Used in the quick setup.
 // :TODO: Create presets for all supported actions.
@@ -11,6 +12,12 @@ const presets: DestinationDefinition['presets'] = [
     subscribe: 'type = "track"',
     partnerAction: 'trackEvent',
     mapping: defaultValues(trackEvent.fields)
+  },
+  {
+    name: 'Identify Calls',
+    subscribe: 'type = "identify"',
+    partnerAction: 'identifyUser',
+    mapping: defaultValues(identifyUser.fields)
   }
 ]
 
@@ -32,7 +39,8 @@ const destination: DestinationDefinition<Settings> = {
   // :TODO: Implement onDelete.
   presets,
   actions: {
-    trackEvent
+    trackEvent,
+    identifyUser
   }
 }
 
