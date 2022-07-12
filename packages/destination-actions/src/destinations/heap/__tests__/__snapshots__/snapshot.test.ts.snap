@@ -4,7 +4,7 @@ exports[`Testing snapshot for actions-heap destination: identifyUser action - al
 Object {
   "app_id": "G&st^jdtW&@22!QU^",
   "identity": "G&st^jdtW&@22!QU^",
-  "user_id": "G&st^jdtW&@22!QU^",
+  "user_id": 4792922918011540,
 }
 `;
 
@@ -12,7 +12,7 @@ exports[`Testing snapshot for actions-heap destination: identifyUser action - re
 Object {
   "app_id": "G&st^jdtW&@22!QU^",
   "identity": "G&st^jdtW&@22!QU^",
-  "user_id": "G&st^jdtW&@22!QU^",
+  "user_id": 4792922918011540,
 }
 `;
 

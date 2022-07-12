@@ -3,10 +3,13 @@ import type { Settings } from '../generated-types'
 import type { Payload } from './generated-types'
 import dayjs from '../../../lib/dayjs'
 import { HEAP_SEGMENT_LIBRARY_NAME } from '../constants'
+import { getHeapUserId } from '../userIdHash'
 
 type HeapEvent = {
   app_id: string
-  identity: string
+  identity?: string
+  use_user_id?: boolean
+  user_id?: number
   event: string
   properties: {
     [k: string]: unknown
@@ -23,11 +26,20 @@ const action: ActionDefinition<Settings, Payload> = {
     identity: {
       label: 'Identity',
       type: 'string',
-      required: true,
+      allowNull: true,
       description:
         'An identity, typically corresponding to an existing user. If no such identity exists, then a new user will be created with that identity. Case-sensitive string, limited to 255 characters.',
       default: {
         '@path': '$.userId'
+      }
+    },
+    anonymous_id: {
+      label: 'Anonymous ID',
+      type: 'string',
+      allowNull: true,
+      description: 'The generated anonymous ID for the user.',
+      default: {
+        '@path': '$.anonymousId'
       }
     },
     event: {
@@ -75,10 +87,16 @@ const action: ActionDefinition<Settings, Payload> = {
 
     const event: HeapEvent = {
       app_id: settings.appId,
-      identity: payload.identity,
       event: payload.event,
       properties: eventProperties,
       idempotency_key: '1' // :TODO:
+    }
+    if (payload.anonymous_id && !payload.identity) {
+      event.use_user_id = true
+      event.user_id = getHeapUserId(payload.anonymous_id)
+    }
+    if (payload.identity) {
+      event.identity = payload.identity
     }
     if (payload.timestamp && dayjs.utc(payload.timestamp).isValid()) {
       event.timestamp = dayjs.utc(payload.timestamp).toISOString()

@@ -2,6 +2,7 @@ import type { ActionDefinition } from '@segment/actions-core'
 import type { Settings } from '../generated-types'
 import type { Payload } from './generated-types'
 import { IntegrationError } from '@segment/actions-core'
+import { getHeapUserId } from '../userIdHash'
 
 const action: ActionDefinition<Settings, Payload> = {
   title: 'Identify User',
@@ -49,7 +50,7 @@ const action: ActionDefinition<Settings, Payload> = {
       const data = {
         app_id: settings.appId,
         identity: payload.user_id,
-        user_id: payload.anonymous_id
+        user_id: getHeapUserId(payload.anonymous_id)
       }
       const identifyResponse = await request('https://heapanalytics.com/api/v1/identify', {
         method: 'post',

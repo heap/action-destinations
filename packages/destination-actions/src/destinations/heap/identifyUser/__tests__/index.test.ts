@@ -26,7 +26,7 @@ describe('Heap.identifyUser', () => {
     expect(responses[0].data).toMatchObject({})
     expect(JSON.parse(responses[0].options.body!.toString())).toMatchObject({
       app_id: HEAP_TEST_APP_ID,
-      user_id: 'anon1',
+      user_id: 435837195053672,
       identity: 'identity1'
     })
 

@@ -4,7 +4,11 @@ export interface Payload {
   /**
    * An identity, typically corresponding to an existing user. If no such identity exists, then a new user will be created with that identity. Case-sensitive string, limited to 255 characters.
    */
-  identity: string
+  identity?: string | null
+  /**
+   * The generated anonymous ID for the user.
+   */
+  anonymous_id?: string | null
   /**
    * The name of the event. Limited to 1024 characters.
    */
