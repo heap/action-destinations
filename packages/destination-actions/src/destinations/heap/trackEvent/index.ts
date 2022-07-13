@@ -91,6 +91,10 @@ const action: ActionDefinition<Settings, Payload> = {
       throw new Error('Missing app ID')
     }
 
+    if (!payload.anonymous_id && !payload.identity) {
+      throw new Error('Either anonymous user id or identity should be specified.')
+    }
+
     const defaultEventProperties = { segment_library: payload.library_name || HEAP_SEGMENT_LIBRARY_NAME }
     const eventProperties = Object.assign(defaultEventProperties, payload.properties ?? {})
 
