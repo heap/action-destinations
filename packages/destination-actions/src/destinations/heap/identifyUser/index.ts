@@ -3,7 +3,7 @@ import type { Settings } from '../generated-types'
 import type { Payload } from './generated-types'
 import { IntegrationError } from '@segment/actions-core'
 import { getHeapUserId } from '../userIdHash'
-import { flattenObj } from '../flattenObj'
+import { flat } from '../flat'
 
 const action: ActionDefinition<Settings, Payload> = {
   title: 'Identify User',
@@ -60,7 +60,7 @@ const action: ActionDefinition<Settings, Payload> = {
       responses.push(identifyResponse)
     }
     if (payload.traits && Object.keys(payload.traits).length > 0) {
-      const flatten = flattenObj(payload.traits)
+      const flatten = flat(payload.traits)
       const data = {
         app_id: settings.appId,
         identity: payload.user_id,

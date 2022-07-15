@@ -4,7 +4,7 @@ import type { Payload } from './generated-types'
 import dayjs from '../../../lib/dayjs'
 import { HEAP_SEGMENT_LIBRARY_NAME } from '../constants'
 import { getHeapUserId } from '../userIdHash'
-import { flattenObj } from '../flattenObj'
+import { flat } from '../flat'
 
 type HeapEvent = {
   app_id: string
@@ -97,7 +97,7 @@ const action: ActionDefinition<Settings, Payload> = {
     }
 
     const defaultEventProperties = { segment_library: payload.library_name || HEAP_SEGMENT_LIBRARY_NAME }
-    const flatten = flattenObj(payload.properties || {})
+    const flatten = flat(payload.properties || {})
     const eventProperties = Object.assign(defaultEventProperties, flatten)
     const event: HeapEvent = {
       app_id: settings.appId,
