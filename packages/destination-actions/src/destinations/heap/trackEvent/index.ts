@@ -154,6 +154,8 @@ const getEventName = (payload: Payload) => {
       eventName = payload.event
       break
     case 'page':
+      eventName = payload.name ? payload.name : 'Page Viewed'
+      break
     case 'screen':
       eventName = payload.name ? payload.name : 'Screen Viewed'
       break
