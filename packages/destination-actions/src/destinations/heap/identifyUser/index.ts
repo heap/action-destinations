@@ -63,7 +63,7 @@ const action: ActionDefinition<Settings, Payload> = {
       userPropertiesPayload.properties.anonymous_id = payload.anonymous_id
     }
 
-    if (payload.user_id) {
+    if (payload.identify) {
       userPropertiesPayload.identify = payload.identify
     }
 

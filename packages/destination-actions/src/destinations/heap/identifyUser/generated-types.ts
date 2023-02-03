@@ -2,9 +2,9 @@
 
 export interface Payload {
   /**
-   * An identity, typically corresponding to an existing user. If no such identity exists, then a new user will be created with that identity. Case-sensitive string, limited to 255 characters.
+   * A unique user identifier. The value that the heap identify call will use to identify the user. Defaults to userId. Case-sensitive string, limited to 255 characters.
    */
-  user_id?: string | null
+  identify?: string | null
   /**
    * The generated anonymous ID for the user.
    */
