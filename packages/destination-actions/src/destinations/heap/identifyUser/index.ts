@@ -2,20 +2,30 @@ import type { ActionDefinition } from '@segment/actions-core'
 import type { Settings } from '../generated-types'
 import type { Payload } from './generated-types'
 import { IntegrationError } from '@segment/actions-core'
-import { getHeapUserId } from '../userIdHash'
 import { flat } from '../flat'
+
+type AddUserPropertiesPayload = {
+  app_id: string
+  identify?: string
+  properties: {
+    anonymous_id?: string
+    email?: string
+    [k: string]: unknown
+  }
+}
 
 const action: ActionDefinition<Settings, Payload> = {
   title: 'Identify User',
-  description: 'Set the user ID for a particular device ID or update user properties.',
+  description:
+    'Set the user properties for a particular device ID or user. More information here: https://developers.heap.io/reference/add-user-properties',
   defaultSubscription: 'type = "identify"',
   fields: {
-    user_id: {
+    identify: {
       label: 'User ID',
       type: 'string',
       allowNull: true,
       description:
-        'An identity, typically corresponding to an existing user. If no such identity exists, then a new user will be created with that identity. Case-sensitive string, limited to 255 characters.',
+        'A unique user identifier. The value that the heap identify call will use to identify the user. Defaults to userId.',
       default: {
         '@path': '$.userId'
       }
@@ -24,7 +34,7 @@ const action: ActionDefinition<Settings, Payload> = {
       label: 'Anonymous ID',
       type: 'string',
       allowNull: true,
-      description: 'The generated anonymous ID for the user.',
+      description: 'The Segment anonymous ID corresponding to this user.',
       default: {
         '@path': '$.anonymousId'
       }
@@ -44,35 +54,31 @@ const action: ActionDefinition<Settings, Payload> = {
       throw new IntegrationError('Missing Heap app ID.', 'Missing required field', 400)
     }
 
-    const responses = []
+    const userPropertiesPayload: AddUserPropertiesPayload = {
+      app_id: settings.appId,
+      properties: {}
+    }
 
     if (payload.anonymous_id) {
-      const data = {
-        app_id: settings.appId,
-        identity: payload.user_id,
-        user_id: getHeapUserId(payload.anonymous_id)
-      }
-      const identifyResponse = await request('https://heapanalytics.com/api/v1/identify', {
-        method: 'post',
-        json: data
-      })
-      responses.push(identifyResponse)
+      userPropertiesPayload.properties.anonymous_id = payload.anonymous_id
     }
+
+    if (payload.user_id) {
+      userPropertiesPayload.identify = payload.identify
+    }
+
     if (payload.traits && Object.keys(payload.traits).length > 0) {
       const flatten = flat(payload.traits)
-      const data = {
-        app_id: settings.appId,
-        identity: payload.user_id,
-        properties: flatten
+      userPropertiesPayload.properties = {
+        ...flatten,
+        ...userPropertiesPayload.properties
       }
-
-      const addUserPropertiesEndpoint = request('https://heapanalytics.com/api/add_user_properties', {
-        method: 'post',
-        json: data
-      })
-      responses.push(addUserPropertiesEndpoint)
     }
-    return Promise.all(responses)
+
+    return request('https://heapanalytics.com/api/add_user_properties', {
+      method: 'post',
+      json: userPropertiesPayload
+    })
   }
 }
 
