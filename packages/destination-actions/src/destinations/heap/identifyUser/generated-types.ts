@@ -4,7 +4,7 @@ export interface Payload {
   /**
    * A unique user identifier. The value that the heap identify call will use to identify the user. Defaults to userId. Case-sensitive string, limited to 255 characters.
    */
-  identify?: string | null
+  identity?: string | null
   /**
    * The generated anonymous ID for the user.
    */

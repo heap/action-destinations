@@ -20,7 +20,7 @@ const action: ActionDefinition<Settings, Payload> = {
     'Set the user properties for a particular device ID or user. More information here: https://developers.heap.io/reference/add-user-properties',
   defaultSubscription: 'type = "identify"',
   fields: {
-    identify: {
+    identity: {
       label: 'User ID',
       type: 'string',
       allowNull: true,
@@ -63,8 +63,8 @@ const action: ActionDefinition<Settings, Payload> = {
       userPropertiesPayload.properties.anonymous_id = payload.anonymous_id
     }
 
-    if (payload.identify) {
-      userPropertiesPayload.identify = payload.identify
+    if (payload.identity) {
+      userPropertiesPayload.identify = payload.identity
     }
 
     if (payload.traits && Object.keys(payload.traits).length > 0) {
