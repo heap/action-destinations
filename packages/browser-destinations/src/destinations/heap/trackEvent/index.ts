@@ -3,7 +3,7 @@ import type { Settings } from '../generated-types'
 import type { Payload } from './generated-types'
 import { HeapApi } from '../types'
 import { HEAP_SEGMENT_BROWSER_LIBRARY_NAME } from '../constants'
-import { isDefined, flat } from '../utils'
+import { isDefined, flat, Properties } from '../utils'
 
 const action: BrowserActionDefinition<Settings, HeapApi, Payload> = {
   title: 'Track Event',
@@ -56,8 +56,7 @@ const action: BrowserActionDefinition<Settings, HeapApi, Payload> = {
     }
   },
   perform: (heap, event) => {
-    const eventProperties = Object.assign({}, event.payload.properties)
-    eventProperties.segment_library = HEAP_SEGMENT_BROWSER_LIBRARY_NAME
+    // Add user properties
     if (event.payload.anonymousId || isDefined(event.payload?.traits)) {
       const traits = flat(event.payload?.traits)
       heap.addUserProperties({
@@ -65,11 +64,51 @@ const action: BrowserActionDefinition<Settings, HeapApi, Payload> = {
         ...(isDefined(traits) && traits)
       })
     }
+
+    // Identify user
     if (event.payload?.identity && isDefined(event.payload?.identity)) {
       heap.identify(event.payload.identity)
     }
-    heap.track(event.payload.name, eventProperties)
+
+    // Track Events
+    const eventProperties = Object.assign({}, event.payload.properties)
+    const eventName = event.payload.name
+    const arrayProperties: { [key: string]: Properties[] } = {}
+
+    for (const [key, value] of Object.entries(eventProperties)) {
+      if (Array.isArray(value)) {
+        arrayProperties[key] = value
+        delete eventProperties[key]
+      }
+    }
+
+    heapTrack(heap, eventName, eventProperties)
+
+    for (const [arrayPropertyKey, arrayPropertyValues] of Object.entries(arrayProperties)) {
+      arrayPropertyValues.forEach((arrayPropertyValue) => {
+        let arrayProperties = {}
+        for (const [key, value] of Object.entries(arrayPropertyValue)) {
+          if (typeof value == 'object' && value !== null) {
+            arrayProperties = { ...arrayProperties, ...flat(value as Properties, key) }
+          } else {
+            arrayProperties = Object.assign(arrayProperties, { [key]: value })
+          }
+        }
+        heapTrack(heap, `${eventName} ${arrayPropertyKey} item`, arrayProperties)
+      })
+    }
   }
+}
+
+const heapTrack = (
+  heap: HeapApi,
+  eventName: string,
+  properties: {
+    [k: string]: unknown
+  }
+) => {
+  properties.segment_library = HEAP_SEGMENT_BROWSER_LIBRARY_NAME
+  heap.track(eventName, properties)
 }
 
 export default action

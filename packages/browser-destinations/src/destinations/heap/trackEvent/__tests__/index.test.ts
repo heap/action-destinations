@@ -36,13 +36,47 @@ describe('#trackEvent', () => {
         type: 'track',
         name: 'hello!',
         properties: {
-          banana: '📞'
+          banana: '📞',
+          apple: [
+            {
+              carrot: 12,
+              broccoli: [
+                {
+                  onion: 'crisp',
+                  tomato: 'fruit'
+                }
+              ]
+            },
+            {
+              carrot: 21,
+              broccoli: [
+                {
+                  tomato: 'vegetable'
+                },
+                {
+                  tomato: 'fruit'
+                }
+              ]
+            }
+          ]
         }
       })
     )
-
-    expect(heapTrackSpy).toHaveBeenCalledWith('hello!', {
+    expect(heapTrackSpy).toHaveBeenCalledTimes(3)
+    expect(heapTrackSpy).toHaveBeenNthCalledWith(1, 'hello!', {
       banana: '📞',
+      segment_library: HEAP_SEGMENT_BROWSER_LIBRARY_NAME
+    })
+    expect(heapTrackSpy).toHaveBeenNthCalledWith(2, 'hello! apple item', {
+      carrot: 12,
+      'broccoli.0.onion': 'crisp',
+      'broccoli.0.tomato': 'fruit',
+      segment_library: HEAP_SEGMENT_BROWSER_LIBRARY_NAME
+    })
+    expect(heapTrackSpy).toHaveBeenNthCalledWith(3, 'hello! apple item', {
+      carrot: 21,
+      'broccoli.0.tomato': 'vegetable',
+      'broccoli.1.tomato': 'fruit',
       segment_library: HEAP_SEGMENT_BROWSER_LIBRARY_NAME
     })
     expect(addUserPropertiesSpy).toHaveBeenCalledTimes(0)
