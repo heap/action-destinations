@@ -3,7 +3,7 @@ import type { Settings } from '../generated-types'
 import type { Payload } from './generated-types'
 import { HeapApi } from '../types'
 import { HEAP_SEGMENT_BROWSER_LIBRARY_NAME } from '../constants'
-import { isDefined, flat, Properties } from '../utils'
+import { isDefined, flat, flattenProperties } from '../utils'
 
 const action: BrowserActionDefinition<Settings, HeapApi, Payload> = {
   title: 'Track Event',
@@ -118,19 +118,6 @@ const heapTrack = (
 ) => {
   properties.segment_library = HEAP_SEGMENT_BROWSER_LIBRARY_NAME
   heap.track(eventName, properties)
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const flattenProperties = (arrayPropertyValue: any) => {
-  let arrayProperties = {}
-  for (const [key, value] of Object.entries(arrayPropertyValue)) {
-    if (typeof value == 'object' && value !== null) {
-      arrayProperties = { ...arrayProperties, ...flat({ [key]: value as Properties }) }
-    } else {
-      arrayProperties = Object.assign(arrayProperties, { [key]: value })
-    }
-  }
-  return arrayProperties
 }
 
 export default action

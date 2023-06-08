@@ -72,7 +72,7 @@ export const destination: BrowserDestinationDefinition<Settings, HeapApi> = {
     browserArrayLimit: {
       label: 'Browser Array Limit',
       description:
-        'This is an optional setting. When set, nested arrays items will be sent in as new Heap events. Defaults to 0.',
+        'This is an optional setting. When set, nested array items will be sent in as new Heap events. Defaults to 0.',
       type: 'number',
       required: false
     }
