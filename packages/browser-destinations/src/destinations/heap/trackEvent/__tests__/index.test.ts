@@ -99,7 +99,15 @@ describe('#trackEvent', () => {
       booleanTrue: true,
       booleanFalse: false,
       nullValue: null,
-      segment_library: HEAP_SEGMENT_BROWSER_LIBRARY_NAME
+      segment_library: HEAP_SEGMENT_BROWSER_LIBRARY_NAME,
+      'apple.0.broccoli.0.onion': 'crisp',
+      'apple.0.broccoli.0.tomato': 'fruit',
+      'apple.0.carrot': '12',
+      'apple.1.broccoli.0.tomato': 'vegetable',
+      'apple.1.broccoli.1.tomato': 'fruit',
+      'apple.1.broccoli.2.0.pickle': 'vinegar',
+      'apple.1.broccoli.2.1.pie': '3.1415',
+      'apple.1.carrot': '21'
     })
     expect(addUserPropertiesSpy).toHaveBeenCalledTimes(0)
     expect(identifySpy).toHaveBeenCalledTimes(0)
@@ -130,7 +138,15 @@ describe('#trackEvent', () => {
         segment_library: HEAP_SEGMENT_BROWSER_LIBRARY_NAME
       })
     }
-    expect(heapTrackSpy).toHaveBeenNthCalledWith(6, 'hello!', { segment_library: HEAP_SEGMENT_BROWSER_LIBRARY_NAME })
+    expect(heapTrackSpy).toHaveBeenNthCalledWith(6, 'hello!', {
+      segment_library: HEAP_SEGMENT_BROWSER_LIBRARY_NAME,
+      'testArray1.0.val': '1',
+      'testArray1.1.val': '2',
+      'testArray1.2.val': '3',
+      'testArray2.0.val': '4',
+      'testArray2.1.val': '5',
+      'testArray2.2.val': 'N/A'
+    })
   })
 
   it('should send segment_library property if no other properties were provided', async () => {

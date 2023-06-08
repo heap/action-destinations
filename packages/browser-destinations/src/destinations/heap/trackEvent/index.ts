@@ -71,7 +71,7 @@ const action: BrowserActionDefinition<Settings, HeapApi, Payload> = {
     }
 
     // Track Events
-    const eventProperties = Object.assign({}, event.payload.properties)
+    let eventProperties = Object.assign({}, event.payload.properties)
     const eventName = event.payload.name
     const browserArrayLimit = event.settings.browserArrayLimit || 0
     const browserArrayLimitSet = !!browserArrayLimit
@@ -82,24 +82,29 @@ const action: BrowserActionDefinition<Settings, HeapApi, Payload> = {
         break
       }
 
-      if (Array.isArray(value)) {
-        const arrayLength = value.length
-        let arrayPropertyValues
-        if (browserArrayLimitSet && arrayLength + arrayEventsCount > browserArrayLimit) {
-          arrayPropertyValues = value.splice(0, browserArrayLimit - arrayEventsCount)
-        } else {
-          arrayPropertyValues = value
-        }
-        delete eventProperties[key]
-        arrayEventsCount += arrayLength
-
-        arrayPropertyValues.forEach((arrayPropertyValue) => {
-          const arrayProperties = flattenProperties(arrayPropertyValue)
-          heapTrack(heap, `${eventName} ${key} item`, arrayProperties)
-        })
+      if (!Array.isArray(value)) {
+        continue
       }
-    }
 
+      delete eventProperties[key]
+      eventProperties = { ...eventProperties, ...flat({ [key]: value }) }
+
+      const arrayLength = value.length
+      let arrayPropertyValues
+      // truncate in case there are multiple array properties
+      if (browserArrayLimitSet && arrayLength + arrayEventsCount > browserArrayLimit) {
+        arrayPropertyValues = value.splice(0, browserArrayLimit - arrayEventsCount)
+      } else {
+        arrayPropertyValues = value
+      }
+
+      arrayEventsCount += arrayLength
+
+      arrayPropertyValues.forEach((arrayPropertyValue) => {
+        const arrayProperties = flattenProperties(arrayPropertyValue)
+        heapTrack(heap, `${eventName} ${key} item`, arrayProperties)
+      })
+    }
     heapTrack(heap, eventName, eventProperties)
   }
 }
@@ -115,11 +120,12 @@ const heapTrack = (
   heap.track(eventName, properties)
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const flattenProperties = (arrayPropertyValue: any) => {
   let arrayProperties = {}
   for (const [key, value] of Object.entries(arrayPropertyValue)) {
     if (typeof value == 'object' && value !== null) {
-      arrayProperties = { ...arrayProperties, ...flat(value as Properties, key) }
+      arrayProperties = { ...arrayProperties, ...flat({ [key]: value as Properties }) }
     } else {
       arrayProperties = Object.assign(arrayProperties, { [key]: value })
     }
