@@ -73,42 +73,34 @@ const action: BrowserActionDefinition<Settings, HeapApi, Payload> = {
     // Track Events
     const eventProperties = Object.assign({}, event.payload.properties)
     const eventName = event.payload.name
-    const arrayProperties: { [key: string]: Properties[] } = {}
-    const browserArrayLimit = event.settings.browserArrayLimit || 1000
+    const browserArrayLimit = event.settings.browserArrayLimit || 0
+    const browserArrayLimitSet = !!browserArrayLimit
     let arrayPropertyCount = 0
 
     for (const [key, value] of Object.entries(eventProperties)) {
-      if (arrayPropertyCount >= browserArrayLimit) {
+      if (browserArrayLimitSet && arrayPropertyCount >= browserArrayLimit) {
         break
       }
 
       if (Array.isArray(value)) {
         const arrayLength = value.length
-        if (arrayLength + arrayPropertyCount > browserArrayLimit) {
-          arrayProperties[key] = value.splice(0, browserArrayLimit - arrayPropertyCount)
+        let arrayPropertyValues
+        if (browserArrayLimitSet && arrayLength + arrayPropertyCount > browserArrayLimit) {
+          arrayPropertyValues = value.splice(0, browserArrayLimit - arrayPropertyCount)
         } else {
-          arrayProperties[key] = value
+          arrayPropertyValues = value
         }
         delete eventProperties[key]
         arrayPropertyCount += arrayLength
+
+        arrayPropertyValues.forEach((arrayPropertyValue) => {
+          const arrayProperties = flattenProperties(arrayPropertyValue)
+          heapTrack(heap, `${eventName} ${key} item`, arrayProperties)
+        })
       }
     }
 
     heapTrack(heap, eventName, eventProperties)
-
-    for (const [arrayPropertyKey, arrayPropertyValues] of Object.entries(arrayProperties)) {
-      arrayPropertyValues.forEach((arrayPropertyValue) => {
-        let arrayProperties = {}
-        for (const [key, value] of Object.entries(arrayPropertyValue)) {
-          if (typeof value == 'object' && value !== null) {
-            arrayProperties = { ...arrayProperties, ...flat(value as Properties, key) }
-          } else {
-            arrayProperties = Object.assign(arrayProperties, { [key]: value })
-          }
-        }
-        heapTrack(heap, `${eventName} ${arrayPropertyKey} item`, arrayProperties)
-      })
-    }
   }
 }
 
@@ -121,6 +113,18 @@ const heapTrack = (
 ) => {
   properties.segment_library = HEAP_SEGMENT_BROWSER_LIBRARY_NAME
   heap.track(eventName, properties)
+}
+
+const flattenProperties = (arrayPropertyValue: any) => {
+  let arrayProperties = {}
+  for (const [key, value] of Object.entries(arrayPropertyValue)) {
+    if (typeof value == 'object' && value !== null) {
+      arrayProperties = { ...arrayProperties, ...flat(value as Properties, key) }
+    } else {
+      arrayProperties = Object.assign(arrayProperties, { [key]: value })
+    }
+  }
+  return arrayProperties
 }
 
 export default action

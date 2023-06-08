@@ -79,26 +79,26 @@ describe('#trackEvent', () => {
       })
     )
     expect(heapTrackSpy).toHaveBeenCalledTimes(3)
-    expect(heapTrackSpy).toHaveBeenNthCalledWith(1, 'hello!', {
-      banana: '📞',
-      float: 1.2345,
-      booleanTrue: true,
-      booleanFalse: false,
-      nullValue: null,
-      segment_library: HEAP_SEGMENT_BROWSER_LIBRARY_NAME
-    })
-    expect(heapTrackSpy).toHaveBeenNthCalledWith(2, 'hello! apple item', {
+    expect(heapTrackSpy).toHaveBeenNthCalledWith(1, 'hello! apple item', {
       carrot: 12,
       'broccoli.0.onion': 'crisp',
       'broccoli.0.tomato': 'fruit',
       segment_library: HEAP_SEGMENT_BROWSER_LIBRARY_NAME
     })
-    expect(heapTrackSpy).toHaveBeenNthCalledWith(3, 'hello! apple item', {
+    expect(heapTrackSpy).toHaveBeenNthCalledWith(2, 'hello! apple item', {
       carrot: 21,
       'broccoli.0.tomato': 'vegetable',
       'broccoli.1.tomato': 'fruit',
       'broccoli.2.0.pickle': 'vinegar',
       'broccoli.2.1.pie': '3.1415',
+      segment_library: HEAP_SEGMENT_BROWSER_LIBRARY_NAME
+    })
+    expect(heapTrackSpy).toHaveBeenNthCalledWith(3, 'hello!', {
+      banana: '📞',
+      float: 1.2345,
+      booleanTrue: true,
+      booleanFalse: false,
+      nullValue: null,
       segment_library: HEAP_SEGMENT_BROWSER_LIBRARY_NAME
     })
     expect(addUserPropertiesSpy).toHaveBeenCalledTimes(0)
@@ -111,25 +111,26 @@ describe('#trackEvent', () => {
         type: 'track',
         name: 'hello!',
         properties: {
-          testArray1: [{ val: 2 }, { val: 3 }, { val: 4 }],
-          testArray2: [{ val: 5 }, { val: 6 }, { val: 'N/A' }]
+          testArray1: [{ val: 1 }, { val: 2 }, { val: 3 }],
+          testArray2: [{ val: 4 }, { val: 5 }, { val: 'N/A' }]
         }
       })
     )
     expect(heapTrackSpy).toHaveBeenCalledTimes(6)
-    expect(heapTrackSpy).toHaveBeenNthCalledWith(1, 'hello!', { segment_library: HEAP_SEGMENT_BROWSER_LIBRARY_NAME })
-    for (let i = 2; i <= 4; i++) {
+
+    for (let i = 1; i <= 3; i++) {
       expect(heapTrackSpy).toHaveBeenNthCalledWith(i, 'hello! testArray1 item', {
         val: i,
         segment_library: HEAP_SEGMENT_BROWSER_LIBRARY_NAME
       })
     }
-    for (let i = 5; i <= 6; i++) {
+    for (let i = 4; i <= 5; i++) {
       expect(heapTrackSpy).toHaveBeenNthCalledWith(i, 'hello! testArray2 item', {
         val: i,
         segment_library: HEAP_SEGMENT_BROWSER_LIBRARY_NAME
       })
     }
+    expect(heapTrackSpy).toHaveBeenNthCalledWith(6, 'hello!', { segment_library: HEAP_SEGMENT_BROWSER_LIBRARY_NAME })
   })
 
   it('should send segment_library property if no other properties were provided', async () => {
