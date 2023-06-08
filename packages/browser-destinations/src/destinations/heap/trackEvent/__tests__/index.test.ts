@@ -18,7 +18,9 @@ describe('#trackEvent', () => {
     mockHeapJsHttpRequest()
     window.heap = createMockedHeapJsSdk()
 
-    event = (await heapDestination({ appId: HEAP_TEST_ENV_ID, subscriptions: [trackEventSubscription] }))[0]
+    event = (
+      await heapDestination({ appId: HEAP_TEST_ENV_ID, subscriptions: [trackEventSubscription], browserArrayLimit: 5 })
+    )[0]
 
     await event.load(Context.system(), {} as Analytics)
     heapTrackSpy = jest.spyOn(window.heap, 'track')
@@ -101,6 +103,33 @@ describe('#trackEvent', () => {
     })
     expect(addUserPropertiesSpy).toHaveBeenCalledTimes(0)
     expect(identifySpy).toHaveBeenCalledTimes(0)
+  })
+
+  it('limits number of properties in array', async () => {
+    await event.track?.(
+      new Context({
+        type: 'track',
+        name: 'hello!',
+        properties: {
+          testArray1: [{ val: 2 }, { val: 3 }, { val: 4 }],
+          testArray2: [{ val: 5 }, { val: 6 }, { val: 'N/A' }]
+        }
+      })
+    )
+    expect(heapTrackSpy).toHaveBeenCalledTimes(6)
+    expect(heapTrackSpy).toHaveBeenNthCalledWith(1, 'hello!', { segment_library: HEAP_SEGMENT_BROWSER_LIBRARY_NAME })
+    for (let i = 2; i <= 4; i++) {
+      expect(heapTrackSpy).toHaveBeenNthCalledWith(i, 'hello! testArray1 item', {
+        val: i,
+        segment_library: HEAP_SEGMENT_BROWSER_LIBRARY_NAME
+      })
+    }
+    for (let i = 5; i <= 6; i++) {
+      expect(heapTrackSpy).toHaveBeenNthCalledWith(i, 'hello! testArray2 item', {
+        val: i,
+        segment_library: HEAP_SEGMENT_BROWSER_LIBRARY_NAME
+      })
+    }
   })
 
   it('should send segment_library property if no other properties were provided', async () => {
