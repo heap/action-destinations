@@ -75,23 +75,23 @@ const action: BrowserActionDefinition<Settings, HeapApi, Payload> = {
     const eventName = event.payload.name
     const browserArrayLimit = event.settings.browserArrayLimit || 0
     const browserArrayLimitSet = !!browserArrayLimit
-    let arrayPropertyCount = 0
+    let arrayEventsCount = 0
 
     for (const [key, value] of Object.entries(eventProperties)) {
-      if (browserArrayLimitSet && arrayPropertyCount >= browserArrayLimit) {
+      if (browserArrayLimitSet && arrayEventsCount >= browserArrayLimit) {
         break
       }
 
       if (Array.isArray(value)) {
         const arrayLength = value.length
         let arrayPropertyValues
-        if (browserArrayLimitSet && arrayLength + arrayPropertyCount > browserArrayLimit) {
-          arrayPropertyValues = value.splice(0, browserArrayLimit - arrayPropertyCount)
+        if (browserArrayLimitSet && arrayLength + arrayEventsCount > browserArrayLimit) {
+          arrayPropertyValues = value.splice(0, browserArrayLimit - arrayEventsCount)
         } else {
           arrayPropertyValues = value
         }
         delete eventProperties[key]
-        arrayPropertyCount += arrayLength
+        arrayEventsCount += arrayLength
 
         arrayPropertyValues.forEach((arrayPropertyValue) => {
           const arrayProperties = flattenProperties(arrayPropertyValue)

@@ -22,7 +22,7 @@ export interface Settings {
    */
   hostname?: string
   /**
-   * This is an optional setting used to set the limit of entries in an array in a heap track call. Defaults to 1000.
+   * This is an optional setting. When set, nested arrays items will be sent in as new Heap events. Defaults to 0.
    */
   browserArrayLimit?: number
 }
