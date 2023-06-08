@@ -55,16 +55,34 @@ describe('#trackEvent', () => {
                 },
                 {
                   tomato: 'fruit'
-                }
+                },
+                [
+                  {
+                    pickle: 'vinegar'
+                  },
+                  {
+                    pie: 3.1415
+                  }
+                ]
               ]
             }
-          ]
+          ],
+          emptyArray: [],
+          float: 1.2345,
+          booleanTrue: true,
+          booleanFalse: false,
+          nullValue: null,
+          undefinedValue: undefined
         }
       })
     )
     expect(heapTrackSpy).toHaveBeenCalledTimes(3)
     expect(heapTrackSpy).toHaveBeenNthCalledWith(1, 'hello!', {
       banana: '📞',
+      float: 1.2345,
+      booleanTrue: true,
+      booleanFalse: false,
+      nullValue: null,
       segment_library: HEAP_SEGMENT_BROWSER_LIBRARY_NAME
     })
     expect(heapTrackSpy).toHaveBeenNthCalledWith(2, 'hello! apple item', {
@@ -77,6 +95,8 @@ describe('#trackEvent', () => {
       carrot: 21,
       'broccoli.0.tomato': 'vegetable',
       'broccoli.1.tomato': 'fruit',
+      'broccoli.2.0.pickle': 'vinegar',
+      'broccoli.2.1.pie': '3.1415',
       segment_library: HEAP_SEGMENT_BROWSER_LIBRARY_NAME
     })
     expect(addUserPropertiesSpy).toHaveBeenCalledTimes(0)
